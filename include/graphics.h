@@ -7090,6 +7090,7 @@ extern const u8 gMonFootprint_Calyrex[];
 
 // trainer sprites
 extern const u32 gTrainerFrontPic_Hiker[];
+extern const u32 gTrainerFrontPic_Iolite[];
 extern const u32 gTrainerFrontPic_AquaGruntM[];
 extern const u32 gTrainerFrontPic_PokemonBreederF[];
 extern const u32 gTrainerFrontPic_CoolTrainerM[];
@@ -7184,6 +7185,7 @@ extern const u32 gTrainerFrontPic_RubySapphireBrendan[];
 extern const u32 gTrainerFrontPic_RubySapphireMay[];
 
 extern const u32 gTrainerPalette_Hiker[];
+extern const u32 gTrainerPalette_Iolite[];
 extern const u32 gTrainerPalette_AquaGruntM[];
 extern const u32 gTrainerPalette_PokemonBreederF[];
 extern const u32 gTrainerPalette_CoolTrainerM[];

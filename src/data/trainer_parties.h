@@ -12434,3 +12434,19 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
     .species = SPECIES_KYOGRE,
     }
 };
+
+static const struct TrainerMonCustomized sParty_Iolite1[] = {
+    {
+        .species = SPECIES_VULPIX,
+        .ball = ITEM_MASTER_BALL,
+        .friendship = 42,
+        .gender = TRAINER_MON_FEMALE,
+        .heldItem = ITEM_ASSAULT_VEST,
+        .isShiny = TRUE,
+        .iv = TRAINER_PARTY_IVS(25,26,27,28,29,30),
+        .ev = TRAINER_PARTY_EVS(252, 0, 0, 252, 4, 0),
+        .lvl = 5,
+        .nature = TRAINER_PARTY_NATURE(NATURE_HASTY),
+        .nickname = COMPOUND_STRING("Ginger")
+    }
+};

@@ -166,4 +166,7 @@
 #define CONNECTION_DIVE     5
 #define CONNECTION_EMERGE   6
 
+// extra globals
+#define MAX_TRAINER_ITEMS   4
+
 #endif // GUARD_CONSTANTS_GLOBAL_H

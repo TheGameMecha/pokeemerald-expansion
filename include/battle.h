@@ -317,6 +317,7 @@ struct BattleHistory
     u16 moveHistory[MAX_BATTLERS_COUNT][AI_MOVE_HISTORY_COUNT]; // 3 last used moves for each battler
     u8 moveHistoryIndex[MAX_BATTLERS_COUNT];
     u16 trainerItems[MAX_BATTLERS_COUNT];
+    u8 trainerItemCounts[MAX_BATTLERS_COUNT];
     u8 itemsNo;
     u16 heldItems[MAX_BATTLERS_COUNT];
 };
