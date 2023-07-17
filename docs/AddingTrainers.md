@@ -1,0 +1,11 @@
+Defining a new Trainer Type w/ Sprite
+- Add the sprite to the folder
+- Add extern consts for sprite and pallete in include/graphics.h
+- Insert file references to data/graphics/trainers.h
+- #define trainer pic in include/constants/trainers.h
+- Add in data/trainer_graphics/front_pic_tables.h the scale/offset, the sprite to the frontPicTable, and the pallete to the frontPicPaletteTable
+- Add in data/trainer_graphics/front_pic_anims.h
+- Add in data/pokemon/trainer_class_lookups.h in both arrays
+- #define in include/constants/opponents.h. Be careful about adding too many as there is a hard limit defined
+- Create party information in data/trainer_parties.h
+- Add trainer information in data/trainers.h. Make sure to include info from trainer_parties.h.
