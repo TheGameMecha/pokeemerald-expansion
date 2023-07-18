@@ -59,6 +59,8 @@ struct TrainerCardData
     bool8 unused_F;
     bool8 hasTrades;
     u8 badgeCount[NUM_BADGES];
+    u8 kantoBadgeCount[NUM_BADGES_KANTO];
+    u8 johtoBadgeCount[NUM_BADGES_JOHTO];
     u8 easyChatProfile[TRAINER_CARD_PROFILE_LENGTH][13];
     u8 textPlayersCard[70];
     u8 textHofTime[70];
@@ -824,6 +826,8 @@ static void SetDataFromTrainerCard(void)
     sData->unused_F = FALSE;
     sData->hasTrades = FALSE;
     memset(sData->badgeCount, 0, sizeof(sData->badgeCount));
+    memset(sData->kantoBadgeCount, 0, sizeof(sData->kantoBadgeCount));
+    memset(sData->johtoBadgeCount, 0, sizeof(sData->johtoBadgeCount));
     if (sData->trainerCard.hasPokedex)
         sData->hasPokedex++;
 
@@ -843,6 +847,16 @@ static void SetDataFromTrainerCard(void)
     {
         if (FlagGet(badgeFlag))
             sData->badgeCount[i]++;
+    }
+    for (i = 0, badgeFlag = FLAG_BADGE09_GET; badgeFlag < FLAG_BADGE09_GET + NUM_BADGES_KANTO; badgeFlag++, i++)
+    {
+        if (FlagGet(badgeFlag))
+            sData->kantoBadgeCount[i]++;
+    }
+    for (i = 0, badgeFlag = FLAG_BADGE17_GET; badgeFlag < FLAG_BADGE17_GET + NUM_BADGES_JOHTO; badgeFlag++, i++)
+    {
+        if (FlagGet(badgeFlag))
+            sData->johtoBadgeCount[i]++;
     }
 }
 

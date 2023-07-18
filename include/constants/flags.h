@@ -1350,7 +1350,7 @@
 #define FLAG_SYS_CHAT_USED                           (SYSTEM_FLAGS + 0x5)
 #define FLAG_UNLOCKED_TRENDY_SAYINGS                 (SYSTEM_FLAGS + 0x6)
 
-// Badges
+// Main Badges
 #define FLAG_BADGE01_GET                             (SYSTEM_FLAGS + 0x7)
 #define FLAG_BADGE02_GET                             (SYSTEM_FLAGS + 0x8)
 #define FLAG_BADGE03_GET                             (SYSTEM_FLAGS + 0x9)
@@ -1360,6 +1360,28 @@
 #define FLAG_BADGE07_GET                             (SYSTEM_FLAGS + 0xD)
 #define FLAG_BADGE08_GET                             (SYSTEM_FLAGS + 0xE)
 #define NUM_BADGES                                   (1 + FLAG_BADGE08_GET - FLAG_BADGE01_GET)
+
+// Kanto Badges
+#define FLAG_BADGE09_GET                             (SYSTEM_FLAGS + 0x85)
+#define FLAG_BADGE10_GET                             (SYSTEM_FLAGS + 0x86)
+#define FLAG_BADGE11_GET                             (SYSTEM_FLAGS + 0x87)
+#define FLAG_BADGE12_GET                             (SYSTEM_FLAGS + 0x88)
+#define FLAG_BADGE13_GET                             (SYSTEM_FLAGS + 0x89)
+#define FLAG_BADGE14_GET                             (SYSTEM_FLAGS + 0x8A)
+#define FLAG_BADGE15_GET                             (SYSTEM_FLAGS + 0x8B)
+#define FLAG_BADGE16_GET                             (SYSTEM_FLAGS + 0x8C)
+#define NUM_BADGES_KANTO                             (1 + FLAG_BADGE16_GET - FLAG_BADGE09_GET)
+
+// Johto Badges
+#define FLAG_BADGE17_GET                             (SYSTEM_FLAGS + 0x8D)
+#define FLAG_BADGE18_GET                             (SYSTEM_FLAGS + 0x8E)
+#define FLAG_BADGE19_GET                             (SYSTEM_FLAGS + 0x8F)
+#define FLAG_BADGE20_GET                             (SYSTEM_FLAGS + 0x90)
+#define FLAG_BADGE21_GET                             (SYSTEM_FLAGS + 0x91)
+#define FLAG_BADGE22_GET                             (SYSTEM_FLAGS + 0x92)
+#define FLAG_BADGE23_GET                             (SYSTEM_FLAGS + 0x93)
+#define FLAG_BADGE24_GET                             (SYSTEM_FLAGS + 0x94)
+#define NUM_BADGES_JOHTO                             (1 + FLAG_BADGE24_GET - FLAG_BADGE17_GET)
 
 // Towns and Cities
 #define FLAG_VISITED_LITTLEROOT_TOWN                (SYSTEM_FLAGS + 0xF)
@@ -1501,22 +1523,6 @@
 
 #define FLAG_RECEIVED_POKEDEX_FROM_BIRCH            (SYSTEM_FLAGS + 0x84)
 
-#define FLAG_UNUSED_0x8E5                           (SYSTEM_FLAGS + 0x85) // Unused Flag
-#define FLAG_UNUSED_0x8E6                           (SYSTEM_FLAGS + 0x86) // Unused Flag
-#define FLAG_UNUSED_0x8E7                           (SYSTEM_FLAGS + 0x87) // Unused Flag
-#define FLAG_UNUSED_0x8E8                           (SYSTEM_FLAGS + 0x88) // Unused Flag
-#define FLAG_UNUSED_0x8E9                           (SYSTEM_FLAGS + 0x89) // Unused Flag
-#define FLAG_UNUSED_0x8EA                           (SYSTEM_FLAGS + 0x8A) // Unused Flag
-#define FLAG_UNUSED_0x8EB                           (SYSTEM_FLAGS + 0x8B) // Unused Flag
-#define FLAG_UNUSED_0x8EC                           (SYSTEM_FLAGS + 0x8C) // Unused Flag
-#define FLAG_UNUSED_0x8ED                           (SYSTEM_FLAGS + 0x8D) // Unused Flag
-#define FLAG_UNUSED_0x8EE                           (SYSTEM_FLAGS + 0x8E) // Unused Flag
-#define FLAG_UNUSED_0x8EF                           (SYSTEM_FLAGS + 0x8F) // Unused Flag
-#define FLAG_UNUSED_0x8F0                           (SYSTEM_FLAGS + 0x90) // Unused Flag
-#define FLAG_UNUSED_0x8F1                           (SYSTEM_FLAGS + 0x91) // Unused Flag
-#define FLAG_UNUSED_0x8F2                           (SYSTEM_FLAGS + 0x92) // Unused Flag
-#define FLAG_UNUSED_0x8F3                           (SYSTEM_FLAGS + 0x93) // Unused Flag
-#define FLAG_UNUSED_0x8F4                           (SYSTEM_FLAGS + 0x94) // Unused Flag
 #define FLAG_UNUSED_0x8F5                           (SYSTEM_FLAGS + 0x95) // Unused Flag
 #define FLAG_UNUSED_0x8F6                           (SYSTEM_FLAGS + 0x96) // Unused Flag
 #define FLAG_UNUSED_0x8F7                           (SYSTEM_FLAGS + 0x97) // Unused Flag

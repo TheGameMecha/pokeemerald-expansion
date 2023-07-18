@@ -909,6 +909,16 @@ LittlerootTown_EventScript_GiveRunningShoes::
 	delay 30
 	return
 
+LittleRootTown_EventScript_GivePokemon::
+	lock
+	msgbox Route119_WeatherInstitute_2F_Text_ThanksPleaseTakePokemon, MSGBOX_DEFAULT
+	setvar VAR_TEMP_1, SPECIES_VULPIX
+	givemon SPECIES_VULPIX, 5, ITEM_FIRE_STONE
+	setflag FLAG_SYS_POKEMON_GET
+	setflag FLAG_RESCUED_BIRCH
+	release
+	end
+
 LittlerootTown_Text_OurNewHomeLetsGoInside:
 	.string "MOM: {PLAYER}, we're here, honey!\p"
 	.string "It must be tiring riding with our things\n"
