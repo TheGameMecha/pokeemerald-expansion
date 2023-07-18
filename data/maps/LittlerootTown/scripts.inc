@@ -912,8 +912,8 @@ LittlerootTown_EventScript_GiveRunningShoes::
 LittleRootTown_EventScript_GivePokemon::
 	lock
 	msgbox Route119_WeatherInstitute_2F_Text_ThanksPleaseTakePokemon, MSGBOX_DEFAULT
-	setvar VAR_TEMP_1, SPECIES_VULPIX
-	givemon SPECIES_VULPIX, 5, ITEM_FIRE_STONE
+	setvar VAR_TEMP_1, SPECIES_MAGIKARP
+	givecustommon SPECIES_MAGIKARP, 5, ITEM_NONE, 0, NUM_NATURES, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOVE_SPLASH, MOVE_BUBBLE, MOVE_TACKLE, MOVE_NONE, 0
 	setflag FLAG_SYS_POKEMON_GET
 	setflag FLAG_RESCUED_BIRCH
 	release
