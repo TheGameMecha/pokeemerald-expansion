@@ -915,7 +915,6 @@ LittleRootTown_EventScript_GivePokemon::
 	setvar VAR_TEMP_1, SPECIES_MAGIKARP
 	givecustommon SPECIES_MAGIKARP, 5, ITEM_NONE, 0, NUM_NATURES, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOVE_SPLASH, MOVE_BUBBLE, MOVE_TACKLE, MOVE_NONE, 0
 	setflag FLAG_SYS_POKEMON_GET
-	setflag FLAG_RESCUED_BIRCH
 	release
 	end
 

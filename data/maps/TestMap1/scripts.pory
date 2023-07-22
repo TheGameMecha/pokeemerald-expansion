@@ -1,0 +1,37 @@
+raw `
+TestMap1_MapScripts::
+	.byte 0
+
+`
+
+const POKEMON_TO_GIVE = SPECIES_MAGIKARP
+
+script TestMap1_GivePokemon
+{
+	lock
+	faceplayer
+	if(flag(FLAG_RECEIVED_STARTER) == TRUE) 
+	{
+		msgbox("Good luck on your adventure!")
+	}
+	else
+	{
+		msgbox("Here's a POKéMON!")
+		setvar(VAR_TEMP_1, POKEMON_TO_GIVE)
+		givecustommon(POKEMON_TO_GIVE, 5, ITEM_NONE, 0, NUM_NATURES, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOVE_SPLASH, MOVE_BUBBLE, MOVE_TACKLE, MOVE_NONE, 0)
+		bufferspeciesname (STR_VAR_1, POKEMON_TO_GIVE)
+		playfanfare(MUS_OBTAIN_ITEM)
+		message("{PLAYER} received {STR_VAR_1}!")
+		waitmessage
+		waitfanfare
+		setflag(FLAG_RECEIVED_STARTER)
+		setflag(FLAG_SYS_POKEMON_GET)
+		msgbox("Nickname {STR_VAR_1}?", MSGBOX_YESNO)
+		if(var(VAR_RESULT) == 1)
+		{
+			call(Common_EventScript_GetGiftMonPartySlot)
+			call(Common_EventScript_NameReceivedPartyMon)	
+		}
+	}
+	releaseall
+}
