@@ -66,6 +66,9 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#if WILD_ROAMING == TRUE
+#include "wild_roaming.h"
+#endif
 
 struct CableClubPlayer
 {
@@ -1934,6 +1937,9 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
     case 3:
         InitObjectEventsLocal();
         SetCameraToTrackPlayer();
+        #if WILD_ROAMING == TRUE
+        TrySetupWildRoamingPokemon();
+        #endif
         (*state)++;
         break;
     case 4:

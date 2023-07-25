@@ -39,5 +39,6 @@ u16 GetLocalWildMon(bool8 *isWaterMon);
 u16 GetLocalWaterMon(void);
 bool8 UpdateRepelCounter(void);
 bool8 TryDoDoubleWildBattle(void);
+void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount); // fill the supplied array with X amount of PKMN from the wild table list
 
 #endif // GUARD_WILD_ENCOUNTER_H

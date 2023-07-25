@@ -1,0 +1,1 @@
+const u32 gOverworldPokemonPic_Bulbasaur[] = INCBIN_U32("graphics/object_events/pics/people/brendan/walking.4bpp");

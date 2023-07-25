@@ -4652,3 +4652,24 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_HoOh = {
     .images = sPicTable_HoOh,
     .affineAnims = gDummySpriteAffineAnimTable,
 };
+
+#if WILD_ROAMING == TRUE
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Example = { 
+    .tileTag =TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_EXAMPLE,
+    .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+    .size = 512,
+    .width = 32,
+    .height = 32,
+    .paletteSlot = 0,
+    .shadowSize = SHADOW_SIZE_M,
+    .inanimate = FALSE,
+    .disableReflectionPaletteLoad = FALSE,
+    .tracks = TRACKS_FOOT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .subspriteTables = sOamTables_32x32,
+    .anims = sAnimTable_Standard,
+    .images = gObjectEventPicTable_Example,
+    .affineAnims = gDummySpriteAffineAnimTable,
+};
+#endif

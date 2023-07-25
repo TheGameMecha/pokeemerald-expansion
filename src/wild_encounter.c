@@ -464,6 +464,18 @@ static void CreateWildMon(u16 species, u8 level)
     CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, PickWildMonNature());
 }
 
+void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount)
+{
+    u16 headerId = GetCurrentMapWildMonHeaderId();
+    for(u8 i=0; i < amount; i++)
+    {
+        u8 wildMonIndex = ChooseWildMonIndex_Land();
+        u8 level = ChooseWildMonLevel(gWildMonHeaders[headerId].landMonsInfo->wildPokemon, wildMonIndex, WILD_AREA_LAND);
+        CreateWildMon(gWildMonHeaders[headerId].landMonsInfo->wildPokemon[wildMonIndex].species, level);
+        outputParty[i] = gEnemyParty[0];
+    }
+}
+
 static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 area, u8 flags)
 {
     u8 wildMonIndex = 0;

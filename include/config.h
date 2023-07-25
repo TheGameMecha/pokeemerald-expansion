@@ -75,5 +75,6 @@
 
 // General settings
 #define EXPANSION_INTRO   TRUE    // If TRUE, a custom RHH intro will play after the vanilla copyright screen.
+#define WILD_ROAMING      TRUE // if TRUE, enables extension for wild roaming pokemon like LGP/LGE.
 
 #endif // GUARD_CONFIG_H
