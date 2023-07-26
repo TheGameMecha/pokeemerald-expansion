@@ -996,6 +996,12 @@ Common_EventScript_RemoveStaticPokemon::
 	release
 	end
 
+EventScript_RoamingWildPokemon::
+	lock
+	msgbox gText_Sudowoodo_Attacked, MSGBOX_DEFAULT
+	release
+	end
+
 Common_EventScript_LegendaryFlewAway::
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED

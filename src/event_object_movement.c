@@ -84,7 +84,6 @@ static void MoveCoordsInDirection(u32, s16 *, s16 *, s16, s16);
 static bool8 ObjectEventExecSingleMovementAction(struct ObjectEvent *, struct Sprite *);
 static void SetMovementDelay(struct Sprite *, s16);
 static bool8 WaitForMovementDelay(struct Sprite *);
-static u8 GetCollisionInDirection(struct ObjectEvent *, u8);
 static u32 GetCopyDirection(u8, u32, u32);
 static void TryEnableObjectEventAnim(struct ObjectEvent *, struct Sprite *);
 static void ObjectEventExecHeldMovementAction(struct ObjectEvent *, struct Sprite *);
@@ -1366,7 +1365,7 @@ static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *
     return FALSE;
 }
 
-static void RemoveObjectEvent(struct ObjectEvent *objectEvent)
+void RemoveObjectEvent(struct ObjectEvent *objectEvent)
 {
     objectEvent->active = FALSE;
     RemoveObjectEventInternal(objectEvent);
@@ -1510,6 +1509,27 @@ u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 
     objectEventTemplate.movementRangeY = 0;
     objectEventTemplate.trainerType = TRAINER_TYPE_NONE;
     objectEventTemplate.trainerRange_berryTreeId = 0;
+    return SpawnSpecialObjectEvent(&objectEventTemplate);
+}
+
+u8 SpawnSpecialObjectEventWithScript(u16 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation, const u8 *script)
+{
+    struct ObjectEventTemplate objectEventTemplate;
+
+    x -= MAP_OFFSET;
+    y -= MAP_OFFSET;
+    objectEventTemplate.localId = localId;
+    objectEventTemplate.graphicsId = graphicsId;
+    objectEventTemplate.kind = OBJ_KIND_NORMAL;
+    objectEventTemplate.x = x;
+    objectEventTemplate.y = y;
+    objectEventTemplate.elevation = elevation;
+    objectEventTemplate.movementType = movementBehavior;
+    objectEventTemplate.movementRangeX = 0;
+    objectEventTemplate.movementRangeY = 0;
+    objectEventTemplate.trainerType = TRAINER_TYPE_NONE;
+    objectEventTemplate.trainerRange_berryTreeId = 0;
+    objectEventTemplate.script = script;
     return SpawnSpecialObjectEvent(&objectEventTemplate);
 }
 
@@ -4644,7 +4664,7 @@ u8 GetTrainerFacingDirectionMovementType(u8 direction)
     return gTrainerFacingDirectionMovementTypes[direction];
 }
 
-static u8 GetCollisionInDirection(struct ObjectEvent *objectEvent, u8 direction)
+u8 GetCollisionInDirection(struct ObjectEvent *objectEvent, u8 direction)
 {
     s16 x = objectEvent->currentCoords.x;
     s16 y = objectEvent->currentCoords.y;
@@ -8973,4 +8993,32 @@ u8 MovementAction_FlyDown_Step1(struct ObjectEvent *objectEvent, struct Sprite *
 u8 MovementAction_Fly_Finish(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     return TRUE;
+}
+
+// get position (0 for current, 1 for map) of object event, return to VAR_0x8007, VAR_0x8008
+void GetObjectPosition(void)
+{
+    u16 localId      = gSpecialVar_0x8000;
+    u16 useTemplate  = gSpecialVar_0x8001;
+
+    u16 *x = &gSpecialVar_0x8007;
+    u16 *y = &gSpecialVar_0x8008;
+
+    if (!useTemplate)
+    {
+        /* current position */
+        const u16 objId = GetObjectEventIdByLocalId(localId);
+        const struct ObjectEvent *objEvent = &gObjectEvents[objId];
+        *x = objEvent->currentCoords.x - 7; // subtract out camera size
+        *y = objEvent->currentCoords.y - 7;
+    }
+    else
+    {
+        const struct ObjectEventTemplate *objTemplate =
+            FindObjectEventTemplateByLocalId(localId,
+                    gSaveBlock1Ptr->objectEventTemplates,
+                    gMapHeader.events->objectEventCount);
+        *x = objTemplate->x;
+        *y = objTemplate->y;
+    }
 }
