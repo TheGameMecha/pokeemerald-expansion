@@ -464,6 +464,7 @@ static void CreateWildMon(u16 species, u8 level)
     CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, PickWildMonNature());
 }
 
+#if WILD_ROAMING == TRUE
 void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount)
 {
     u16 headerId = GetCurrentMapWildMonHeaderId();
@@ -475,6 +476,7 @@ void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount)
         outputParty[i] = gEnemyParty[0];
     }
 }
+#endif
 
 static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 area, u8 flags)
 {

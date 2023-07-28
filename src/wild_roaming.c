@@ -7,12 +7,15 @@
 #include "wild_roaming.h"
 #include "event_object_movement.h"
 #include "graphics.h"
-#include "constants/event_objects.h"
 #include "fieldmap.h"
+#include "field_effect.h"
 #include "script.h"
 #include "event_scripts.h"
 #include "field_player_avatar.h"
 #include "battle_setup.h"
+#include "constants/event_objects.h"
+#include "constants/trainer_types.h"
+#include "constants/field_effects.h"
 
 EWRAM_DATA static u8 sLocation[2] = {0}; // represents the current location
 EWRAM_DATA struct Pokemon gWildPokemonInstances[MAX_ACTIVE_PKMN] = {0};
@@ -48,26 +51,109 @@ bool8 CheckForWildPokemonToBattle()
     struct ObjectEvent *objectEvent;
     struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
 
-    for (u8 i = 0; i < MAX_ACTIVE_PKMN; i++)
+    for (u8 i = 0; i < 2; i++)
     {
         u8 index = wildPokemonObjectEventIds[i];
-        if(index == 0) // in this case, index 0 would be the player. We will always collide with ourself...
-        {
-            return FALSE;
-        }
+        // if(index == 0) // in this case, index 0 would be the player. We will always collide with ourself...
+        // {
+        //     return FALSE;
+        // }
         objectEvent = &gWildPokemonObjects[index];
-        u8 collisionA = GetCollisionInDirection(objectEvent, objectEvent->facingDirection);
-        u8 collisionB = GetCollisionInDirection(objectEvent, GetInverseDirection(playerObjEvent->movementDirection));
-        if(collisionA == COLLISION_WILD_POKEMON || collisionB == COLLISION_OBJECT_EVENT)
+
+        s16 x, y;
+        // Check collision from the pokemon's front
+        u8 direction = objectEvent->facingDirection;
+        x = objectEvent->currentCoords.x;
+        y = objectEvent->currentCoords.y;
+        MoveCoords(direction, &x, &y);
+        u8 collision = GetCollisionAtCoords(objectEvent, x, y, direction);
+
+        // Check collision from the player's direction
+        direction = GetInverseDirection(playerObjEvent->movementDirection);
+        x = objectEvent->currentCoords.x;
+        y = objectEvent->currentCoords.y;
+        MoveCoords(direction, &x, &y);
+        u8 collisionB = GetCollisionAtCoords(objectEvent, x, y, direction);
+        if(collision == COLLISION_OBJECT_EVENT || collisionB == COLLISION_OBJECT_EVENT)
         {
+            gFieldEffectArguments[0] = objectEvent->currentCoords.x;
+            gFieldEffectArguments[1] = objectEvent->currentCoords.y;
+            gFieldEffectArguments[2] = gSprites[objectEvent->spriteId].subpriority - 1;
+            gFieldEffectArguments[3] = gSprites[objectEvent->spriteId].oam.priority;
+            FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
+            direction = GetFaceDirectionMovementAction(GetInverseDirection(playerObjEvent->facingDirection));
+            ObjectEventSetHeldMovement(objectEvent, direction);
             StartWildBattle(i);
-            RemoveObjectEvent(objectEvent);
-            wildPokemonObjectEventIds[i] = 0;
+            //RemoveObjectEvent(objectEvent);
+            //wildPokemonObjectEventIds[i] = 0;
             return TRUE;
         }
     }
 
     return FALSE;
+}
+
+static bool8 IsMapCoordOccupied(s16 x, s16 y)
+{
+    x+=MAP_OFFSET;
+    y+=MAP_OFFSET;
+
+    DebugPrintf("Testing Coords: %d, %d", x,y);
+    struct ObjectEvent *objectEvent;
+    for (u8 i = 0; i < OBJECT_EVENTS_COUNT; i++)
+    {
+        objectEvent = &gObjectEvents[i];
+        DebugPrintf("Checking Against Coords: %d, %d", objectEvent->currentCoords.x,objectEvent->currentCoords.y);
+        if(objectEvent->currentCoords.x == x && objectEvent->currentCoords.y == y)
+            return TRUE;
+    }
+
+    for (u8 i = 0; i < MAX_ACTIVE_PKMN; i++)
+    {
+        objectEvent = &gWildPokemonObjects[i];
+        DebugPrintf("Checking Against Coords: %d, %d", objectEvent->currentCoords.x,objectEvent->currentCoords.y);
+        if(objectEvent->currentCoords.x == x && objectEvent->currentCoords.y == y)
+            return TRUE;
+    }
+
+    return FALSE;
+
+}
+
+static void FindMetatileIdMapCoords(s16 *x, s16 *y, u16 metatileId)
+{
+    s16 i, j;
+    const struct MapLayout *mapLayout = gMapHeader.mapLayout;
+
+    for (j = 0; j < mapLayout->height; j++)
+    {
+        for (i = 0; i < mapLayout->width; i++)
+        {
+            if ((mapLayout->map[j * mapLayout->width + i] & MAPGRID_METATILE_ID_MASK) == metatileId)
+            {
+                if(IsMapCoordOccupied(i, j) == FALSE)
+                {
+                    *x = i;
+                    *y = j;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+static struct Coords16 FindSpawnLocation()
+{
+    struct Coords16 location;
+    location.x = gSaveBlock1Ptr->pos.x;
+    location.y = gSaveBlock1Ptr->pos.y;
+
+    for(u8 i = 0; i < WILD_VALID_METATILES; i++)
+    {
+        FindMetatileIdMapCoords(&location.x, &location.y, sValidSpawnMetatiles[i]);
+    }
+
+    return location;
 }
 
 void TrySetupWildRoamingPokemon()
@@ -77,19 +163,26 @@ void TrySetupWildRoamingPokemon()
 
     CreateWildWalkingMons(gWildPokemonInstances, MAX_ACTIVE_PKMN);
 
-    for (u8 i = 0; i < 1; i++)
+    for (u8 i = 0; i < 2; i++)
     {
-        u8 obj = SpawnSpecialObjectEventParameterized(
-            OBJ_EVENT_GFX_EXAMPLE,
-            MOVEMENT_TYPE_FACE_RIGHT,
-            240 - i,
-            gSaveBlock1Ptr->pos.x + i + 2 + MAP_OFFSET,
-            gSaveBlock1Ptr->pos.y + i + MAP_OFFSET,
-            3,
-            OBJ_KIND_WILD_POKEMON);
-        wildPokemonObjectEventIds[i] = obj;
+        u32 species = GetMonData(&gWildPokemonInstances[i], MON_DATA_SPECIES);
+        struct ObjectEventTemplate wildPokemonObjEventTemplate = sWildPokemonObjectEventTemplates[species];
+        u8 objectEventId;
         struct ObjectEvent *objectEvent;
-        objectEvent = &gWildPokemonObjects[obj];
+
+        struct Coords16 spawnLocation = FindSpawnLocation();
+
+        wildPokemonObjEventTemplate.localId =  240 - i;
+        wildPokemonObjEventTemplate.x = spawnLocation.x; //gSaveBlock1Ptr->pos.x + i + 2;
+        wildPokemonObjEventTemplate.y =  spawnLocation.y; //gSaveBlock1Ptr->pos.y + i;
+        wildPokemonObjEventTemplate.elevation = 3;
+        wildPokemonObjEventTemplate.flagId = 0;
+        wildPokemonObjEventTemplate.kind = OBJ_KIND_WILD_POKEMON;
+        objectEventId = SpawnSpecialObjectEvent(&wildPokemonObjEventTemplate);
+
+        wildPokemonObjectEventIds[i] = objectEventId;
+
+        objectEvent = &gWildPokemonObjects[objectEventId];
         objectEvent->isPlayer = FALSE;
     }
 }

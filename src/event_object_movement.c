@@ -1423,7 +1423,7 @@ static bool8 GetAvailableWildPokemonObjectId(u16 localId, u8 mapNum, u8 mapGroup
 {
     u8 i = 0;
 
-    for (i = 0; i < MAX_ACTIVE_PKMN && gObjectEvents[i].active; i++)
+    for (i = 0; i < MAX_ACTIVE_PKMN && gWildPokemonObjects[i].active; i++)
     {
         if (gWildPokemonObjects[i].localId == localId && gWildPokemonObjects[i].mapNum == mapNum && gWildPokemonObjects[i].mapGroup == mapGroup)
             return TRUE;
