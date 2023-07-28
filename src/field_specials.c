@@ -566,7 +566,7 @@ void SpawnLinkPartnerObjectEvent(void)
                     linkSpriteId = OBJ_EVENT_GFX_RIVAL_MAY_NORMAL;
                 break;
             }
-            SpawnSpecialObjectEventParameterized(linkSpriteId, movementTypes[j], 240 - i, coordOffsets[j][0] + x + MAP_OFFSET, coordOffsets[j][1] + y + MAP_OFFSET, 0);
+            SpawnSpecialObjectEventParameterized(linkSpriteId, movementTypes[j], 240 - i, coordOffsets[j][0] + x + MAP_OFFSET, coordOffsets[j][1] + y + MAP_OFFSET, 0, OBJ_KIND_NORMAL);
             LoadLinkPartnerObjectEventSpritePalette(linkSpriteId, 240 - i, i);
             j++;
             if (j == MAX_LINK_PLAYERS)
@@ -1263,7 +1263,8 @@ void SpawnCameraObject(void)
                                                   OBJ_EVENT_ID_CAMERA,
                                                   gSaveBlock1Ptr->pos.x + MAP_OFFSET,
                                                   gSaveBlock1Ptr->pos.y + MAP_OFFSET,
-                                                  3); // elevation
+                                                  3, // elevation
+                                                  OBJ_KIND_NORMAL);
     gObjectEvents[obj].invisible = TRUE;
     CameraObjectSetFollowedSpriteId(gObjectEvents[obj].spriteId);
 }

@@ -58,7 +58,8 @@ enum {
 static u8 setup##_callback(struct ObjectEvent *, struct Sprite *);\
 void setup(struct Sprite *sprite)\
 {\
-    UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->sObjEventId], sprite, setup##_callback);\
+    if (sprite->flags_7 == OBJ_KIND_WILD_POKEMON) {UpdateObjectEventCurrentMovement(&gWildPokemonObjects[sprite->sObjEventId], sprite, setup##_callback);}\
+    else {UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->sObjEventId], sprite, setup##_callback);}\
 }\
 static u8 setup##_callback(struct ObjectEvent *objectEvent, struct Sprite *sprite)\
 {\
@@ -69,7 +70,8 @@ static u8 setup##_callback(struct ObjectEvent *objectEvent, struct Sprite *sprit
 static u8 setup##_callback(struct ObjectEvent *, struct Sprite *);\
 void setup(struct Sprite *sprite)\
 {\
-    UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->sObjEventId], sprite, setup##_callback);\
+    if (sprite->flags_7 == OBJ_KIND_WILD_POKEMON) {UpdateObjectEventCurrentMovement(&gWildPokemonObjects[sprite->sObjEventId], sprite, setup##_callback);}\
+    else {UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->sObjEventId], sprite, setup##_callback);}\
 }\
 static u8 setup##_callback(struct ObjectEvent *objectEvent, struct Sprite *sprite)\
 {\
@@ -91,6 +93,7 @@ static void UpdateObjectEventSpriteAnimPause(struct ObjectEvent *, struct Sprite
 static bool8 IsCoordOutsideObjectEventMovementRange(struct ObjectEvent *, s16, s16);
 static bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *, s16, s16, u8);
 static bool8 DoesObjectCollideWithObjectAt(struct ObjectEvent *, s16, s16);
+static bool8 DoesObjectCollideWithWildPokemonAt(struct ObjectEvent *, s16, s16);
 static void UpdateObjectEventOffscreen(struct ObjectEvent *, struct Sprite *);
 static void UpdateObjectEventSpriteVisibility(struct ObjectEvent *, struct Sprite *);
 static void ObjectEventUpdateMetatileBehaviors(struct ObjectEvent *);
@@ -127,6 +130,7 @@ static void CreateReflectionEffectSprites(void);
 static u8 GetObjectEventIdByLocalId(u8);
 static u8 GetObjectEventIdByLocalIdAndMapInternal(u8, u8, u8);
 static bool8 GetAvailableObjectEventId(u16, u8, u8, u8 *);
+static bool8 GetAvailableWildPokemonObjectId(u16, u8, u8, u8 *);
 static void SetObjectEventDynamicGraphicsId(struct ObjectEvent *);
 static void RemoveObjectEventInternal(struct ObjectEvent *);
 static u16 GetObjectEventFlagIdByObjectEventId(u8);
@@ -1181,10 +1185,21 @@ static void ClearAllObjectEvents(void)
         ClearObjectEvent(&gObjectEvents[i]);
 }
 
+void ClearAllWildPokemonObjects(void)
+{
+    u8 i;
+
+    for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+        ClearObjectEvent(&gWildPokemonObjects[i]);
+}
+
 void ResetObjectEvents(void)
 {
     ClearLinkPlayerObjectEvents();
     ClearAllObjectEvents();
+    #if WILD_ROAMING == TRUE
+    ClearAllWildPokemonObjects();
+    #endif
     ClearPlayerAvatarInfo();
     CreateReflectionEffectSprites();
 }
@@ -1210,6 +1225,18 @@ u8 GetFirstInactiveObjectEventId(void)
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (!gObjectEvents[i].active)
+            break;
+    }
+
+    return i;
+}
+
+u8 GetFirstInactiveWildPokemonObjectEventId(void)
+{
+    u8 i;
+    for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+    {
+        if (!gWildPokemonObjects[i].active)
             break;
     }
 
@@ -1269,6 +1296,18 @@ static u8 GetObjectEventIdByLocalId(u8 localId)
     return OBJECT_EVENTS_COUNT;
 }
 
+static u8 GetWildPokemonObjectIdByLocalId(u8 localId)
+{
+    u8 i;
+    for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+    {
+        if (gWildPokemonObjects[i].active && gWildPokemonObjects[i].localId == localId)
+            return i;
+    }
+
+    return MAX_ACTIVE_PKMN;
+}
+
 static u8 InitObjectEventStateFromTemplate(const struct ObjectEventTemplate *template, u8 mapNum, u8 mapGroup)
 {
     struct ObjectEvent *objectEvent;
@@ -1276,9 +1315,19 @@ static u8 InitObjectEventStateFromTemplate(const struct ObjectEventTemplate *tem
     s16 x;
     s16 y;
 
-    if (GetAvailableObjectEventId(template->localId, mapNum, mapGroup, &objectEventId))
-        return OBJECT_EVENTS_COUNT;
-    objectEvent = &gObjectEvents[objectEventId];
+    if (template->kind == OBJ_KIND_WILD_POKEMON)
+    {
+        if (GetAvailableWildPokemonObjectId(template->localId, mapNum, mapGroup, &objectEventId))
+            return MAX_ACTIVE_PKMN;
+        objectEvent = &gWildPokemonObjects[objectEventId];
+    }
+    else
+    {
+        if (GetAvailableObjectEventId(template->localId, mapNum, mapGroup, &objectEventId))
+            return OBJECT_EVENTS_COUNT;
+        objectEvent = &gObjectEvents[objectEventId];
+    }
+
     ClearObjectEvent(objectEvent);
     x = template->x + MAP_OFFSET;
     y = template->y + MAP_OFFSET;
@@ -1365,6 +1414,31 @@ static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *
     return FALSE;
 }
 
+static bool8 GetAvailableWildPokemonObjectId(u16 localId, u8 mapNum, u8 mapGroup, u8 *objectEventId)
+// Looks for an empty slot.
+// Returns FALSE and the location of the available slot
+// in *objectEventId.
+// If no slots are available, or if the object is already
+// loaded, returns TRUE.
+{
+    u8 i = 0;
+
+    for (i = 0; i < MAX_ACTIVE_PKMN && gObjectEvents[i].active; i++)
+    {
+        if (gWildPokemonObjects[i].localId == localId && gWildPokemonObjects[i].mapNum == mapNum && gWildPokemonObjects[i].mapGroup == mapGroup)
+            return TRUE;
+    }
+    if (i >= MAX_ACTIVE_PKMN)
+        return TRUE;
+    *objectEventId = i;
+    for (; i < MAX_ACTIVE_PKMN; i++)
+    {
+        if (gWildPokemonObjects[i].active && gWildPokemonObjects[i].localId == localId && gWildPokemonObjects[i].mapNum == mapNum && gWildPokemonObjects[i].mapGroup == mapGroup)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void RemoveObjectEvent(struct ObjectEvent *objectEvent)
 {
     objectEvent->active = FALSE;
@@ -1398,6 +1472,11 @@ void RemoveAllObjectEventsExceptPlayer(void)
         if (i != gPlayerAvatar.objectEventId)
             RemoveObjectEvent(&gObjectEvents[i]);
     }
+
+    for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+    {
+        RemoveObjectEvent(&gWildPokemonObjects[i]);
+    }
 }
 
 static u8 TrySetupObjectEventSprite(const struct ObjectEventTemplate *objectEventTemplate, struct SpriteTemplate *spriteTemplate, u8 mapNum, u8 mapGroup, s16 cameraX, s16 cameraY)
@@ -1410,10 +1489,22 @@ static u8 TrySetupObjectEventSprite(const struct ObjectEventTemplate *objectEven
     const struct ObjectEventGraphicsInfo *graphicsInfo;
 
     objectEventId = InitObjectEventStateFromTemplate(objectEventTemplate, mapNum, mapGroup);
-    if (objectEventId == OBJECT_EVENTS_COUNT)
-        return OBJECT_EVENTS_COUNT;
 
-    objectEvent = &gObjectEvents[objectEventId];
+    if (objectEventTemplate->kind == OBJ_KIND_WILD_POKEMON)
+    {
+        if (objectEventId == MAX_ACTIVE_PKMN)
+            return MAX_ACTIVE_PKMN;
+
+        objectEvent = &gWildPokemonObjects[objectEventId];
+    }
+    else
+    {
+        if (objectEventId == OBJECT_EVENTS_COUNT)
+            return OBJECT_EVENTS_COUNT;
+
+        objectEvent = &gObjectEvents[objectEventId];
+    }
+
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
     paletteSlot = graphicsInfo->paletteSlot;
     if (paletteSlot == PALSLOT_PLAYER)
@@ -1437,11 +1528,25 @@ static u8 TrySetupObjectEventSprite(const struct ObjectEventTemplate *objectEven
     spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
     if (spriteId == MAX_SPRITES)
     {
-        gObjectEvents[objectEventId].active = FALSE;
+        if (objectEventTemplate->kind == OBJ_KIND_WILD_POKEMON)
+        {
+            gWildPokemonObjects[objectEventId].active = FALSE;
+        }
+        else
+        {
+            gObjectEvents[objectEventId].active = FALSE;
+        }
+        
         return OBJECT_EVENTS_COUNT;
     }
 
     sprite = &gSprites[spriteId];
+
+    if (objectEventTemplate->kind == OBJ_KIND_WILD_POKEMON)
+        sprite->flags_7 = OBJ_KIND_WILD_POKEMON;
+    else
+        sprite->flags_7 = OBJ_KIND_NORMAL;
+    
     GetMapCoordsFromSpritePos(objectEvent->currentCoords.x + cameraX, objectEvent->currentCoords.y + cameraY, &sprite->x, &sprite->y);
     sprite->centerToCornerVecX = -(graphicsInfo->width >> 1);
     sprite->centerToCornerVecY = -(graphicsInfo->height >> 1);
@@ -1472,13 +1577,26 @@ static u8 TrySpawnObjectEventTemplate(const struct ObjectEventTemplate *objectEv
     MakeSpriteTemplateFromObjectEventTemplate(objectEventTemplate, &spriteTemplate, &subspriteTables);
     spriteFrameImage.size = graphicsInfo->size;
     spriteTemplate.images = &spriteFrameImage;
-    objectEventId = TrySetupObjectEventSprite(objectEventTemplate, &spriteTemplate, mapNum, mapGroup, cameraX, cameraY);
-    if (objectEventId == OBJECT_EVENTS_COUNT)
-        return OBJECT_EVENTS_COUNT;
 
-    gSprites[gObjectEvents[objectEventId].spriteId].images = graphicsInfo->images;
-    if (subspriteTables)
-        SetSubspriteTables(&gSprites[gObjectEvents[objectEventId].spriteId], subspriteTables);
+    objectEventId = TrySetupObjectEventSprite(objectEventTemplate, &spriteTemplate, mapNum, mapGroup, cameraX, cameraY);
+    
+    if (objectEventTemplate->kind == OBJ_KIND_WILD_POKEMON)
+    {
+        if (objectEventId == MAX_ACTIVE_PKMN)
+            return MAX_ACTIVE_PKMN;
+        gSprites[gWildPokemonObjects[objectEventId].spriteId].images = graphicsInfo->images;
+        if (subspriteTables)
+            SetSubspriteTables(&gSprites[gWildPokemonObjects[objectEventId].spriteId], subspriteTables);
+    }
+    else
+    {
+        if (objectEventId == OBJECT_EVENTS_COUNT)
+            return OBJECT_EVENTS_COUNT;
+
+        gSprites[gObjectEvents[objectEventId].spriteId].images = graphicsInfo->images;
+        if (subspriteTables)
+            SetSubspriteTables(&gSprites[gObjectEvents[objectEventId].spriteId], subspriteTables);
+    }
 
     return objectEventId;
 }
@@ -1492,7 +1610,7 @@ u8 SpawnSpecialObjectEvent(struct ObjectEventTemplate *objectEventTemplate)
     return TrySpawnObjectEventTemplate(objectEventTemplate, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
 }
 
-u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation)
+u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation, u8 kind)
 {
     struct ObjectEventTemplate objectEventTemplate;
 
@@ -1500,7 +1618,7 @@ u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 
     y -= MAP_OFFSET;
     objectEventTemplate.localId = localId;
     objectEventTemplate.graphicsId = graphicsId;
-    objectEventTemplate.kind = OBJ_KIND_NORMAL;
+    objectEventTemplate.kind = kind;
     objectEventTemplate.x = x;
     objectEventTemplate.y = y;
     objectEventTemplate.elevation = elevation;
@@ -4691,6 +4809,12 @@ u8 GetCollisionAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u32 dir)
         return COLLISION_ELEVATION_MISMATCH;
     else if (DoesObjectCollideWithObjectAt(objectEvent, x, y))
         return COLLISION_OBJECT_EVENT;
+
+    #if WILD_ROAMING == TRUE
+    else if (DoesObjectCollideWithWildPokemonAt(objectEvent, x, y))
+        return COLLISION_WILD_POKEMON;
+    #endif
+
     return COLLISION_NONE;
 }
 
@@ -4706,6 +4830,11 @@ u8 GetCollisionFlagsAtCoords(struct ObjectEvent *objectEvent, s16 x, s16 y, u8 d
         flags |= 1 << (COLLISION_ELEVATION_MISMATCH - 1);
     if (DoesObjectCollideWithObjectAt(objectEvent, x, y))
         flags |= 1 << (COLLISION_OBJECT_EVENT - 1);
+
+    #if WILD_ROAMING == TRUE
+    if (DoesObjectCollideWithWildPokemonAt(objectEvent, x, y))
+        flags |= 1 << (COLLISION_WILD_POKEMON - 1);
+    #endif
     return flags;
 }
 
@@ -4752,6 +4881,26 @@ static bool8 DoesObjectCollideWithObjectAt(struct ObjectEvent *objectEvent, s16 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         curObject = &gObjectEvents[i];
+        if (curObject->active && curObject != objectEvent)
+        {
+            if ((curObject->currentCoords.x == x && curObject->currentCoords.y == y) || (curObject->previousCoords.x == x && curObject->previousCoords.y == y))
+            {
+                if (AreElevationsCompatible(objectEvent->currentElevation, curObject->currentElevation))
+                    return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
+static bool8 DoesObjectCollideWithWildPokemonAt(struct ObjectEvent *objectEvent, s16 x, s16 y)
+{
+    u8 i;
+    struct ObjectEvent *curObject;
+
+    for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+    {
+        curObject = &gWildPokemonObjects[i];
         if (curObject->active && curObject != objectEvent)
         {
             if ((curObject->currentCoords.x == x && curObject->currentCoords.y == y) || (curObject->previousCoords.x == x && curObject->previousCoords.y == y))

@@ -36,6 +36,9 @@
 static EWRAM_DATA u8 sSpinStartFacingDir = 0;
 EWRAM_DATA struct ObjectEvent gObjectEvents[OBJECT_EVENTS_COUNT] = {};
 EWRAM_DATA struct PlayerAvatar gPlayerAvatar = {};
+#if WILD_ROAMING == TRUE
+EWRAM_DATA struct ObjectEvent gWildPokemonObjects[MAX_ACTIVE_PKMN] = {}; // by creating these in another array, we can make sure they do not interact with the main array and not get added to the save buffer
+#endif
 
 // static declarations
 

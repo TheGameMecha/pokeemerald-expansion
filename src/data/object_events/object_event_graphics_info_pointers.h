@@ -245,7 +245,7 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Giddy;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedMauvilleOldMan1;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedMauvilleOldMan2;
 #if WILD_ROAMING == TRUE
-extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Example;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Example;
 #endif
 
 const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM_OBJ_EVENT_GFX] = {

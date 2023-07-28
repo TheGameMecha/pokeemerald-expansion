@@ -169,4 +169,6 @@
 // extra globals
 #define MAX_TRAINER_ITEMS   4
 
+#define MAX_ACTIVE_PKMN 16
+
 #endif // GUARD_CONSTANTS_GLOBAL_H

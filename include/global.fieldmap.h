@@ -290,6 +290,7 @@ enum
     COLLISION_ISOLATED_HORIZONTAL_RAIL,
     COLLISION_VERTICAL_RAIL,
     COLLISION_HORIZONTAL_RAIL,
+    COLLISION_WILD_POKEMON,
 };
 
 // player running states
@@ -338,6 +339,7 @@ struct Camera
 };
 
 extern struct ObjectEvent gObjectEvents[OBJECT_EVENTS_COUNT];
+extern struct ObjectEvent gWildPokemonObjects[MAX_ACTIVE_PKMN];
 extern u8 gSelectedObjectEvent;
 extern struct MapHeader gMapHeader;
 extern struct PlayerAvatar gPlayerAvatar;

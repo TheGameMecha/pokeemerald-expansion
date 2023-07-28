@@ -14,8 +14,6 @@
 #include "field_player_avatar.h"
 #include "battle_setup.h"
 
-#define MAX_ACTIVE_PKMN 10
-
 EWRAM_DATA static u8 sLocation[2] = {0}; // represents the current location
 EWRAM_DATA struct Pokemon gWildPokemonInstances[MAX_ACTIVE_PKMN] = {0};
 EWRAM_DATA static u8 wildPokemonObjectEventIds[MAX_ACTIVE_PKMN] = {0};
@@ -57,10 +55,10 @@ bool8 CheckForWildPokemonToBattle()
         {
             return FALSE;
         }
-        objectEvent = &gObjectEvents[index];
+        objectEvent = &gWildPokemonObjects[index];
         u8 collisionA = GetCollisionInDirection(objectEvent, objectEvent->facingDirection);
         u8 collisionB = GetCollisionInDirection(objectEvent, GetInverseDirection(playerObjEvent->movementDirection));
-        if(collisionA == COLLISION_OBJECT_EVENT || collisionB == COLLISION_OBJECT_EVENT)
+        if(collisionA == COLLISION_WILD_POKEMON || collisionB == COLLISION_OBJECT_EVENT)
         {
             StartWildBattle(i);
             RemoveObjectEvent(objectEvent);
@@ -83,14 +81,15 @@ void TrySetupWildRoamingPokemon()
     {
         u8 obj = SpawnSpecialObjectEventParameterized(
             OBJ_EVENT_GFX_EXAMPLE,
-            MOVEMENT_TYPE_FACE_UP,
+            MOVEMENT_TYPE_FACE_RIGHT,
             240 - i,
             gSaveBlock1Ptr->pos.x + i + 2 + MAP_OFFSET,
             gSaveBlock1Ptr->pos.y + i + MAP_OFFSET,
-            3);
+            3,
+            OBJ_KIND_WILD_POKEMON);
         wildPokemonObjectEventIds[i] = obj;
         struct ObjectEvent *objectEvent;
-        objectEvent = &gObjectEvents[obj];
+        objectEvent = &gWildPokemonObjects[obj];
         objectEvent->isPlayer = FALSE;
     }
 }

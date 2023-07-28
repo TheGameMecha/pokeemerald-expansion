@@ -2165,6 +2165,9 @@ static void ResumeMap(bool32 a1)
 {
     ResetTasks();
     ResetSpriteData();
+    #if WILD_ROAMING == TRUE
+    ClearAllWildPokemonObjects();
+    #endif
     ResetPaletteFade();
     ScanlineEffect_Clear();
     ResetAllPicSprites();
