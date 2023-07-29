@@ -16,10 +16,24 @@
 #include "constants/event_objects.h"
 #include "constants/trainer_types.h"
 #include "constants/field_effects.h"
+#include "task.h"
+#include "palette.h"
+#include "sound.h"
+#include "malloc.h"
+#include "trainer_see.h"
+#include "constants/songs.h"
 
 EWRAM_DATA static u8 sLocation[2] = {0}; // represents the current location
 EWRAM_DATA struct Pokemon gWildPokemonInstances[MAX_ACTIVE_PKMN] = {0};
 EWRAM_DATA static u8 wildPokemonObjectEventIds[MAX_ACTIVE_PKMN] = {0};
+EWRAM_DATA static u8 currentWildMonIndex;
+EWRAM_DATA static struct WildBattleSetup *sWildBattle = NULL;
+
+struct WildBattleSetup 
+{
+    u16 timer;
+    u8 state;
+};
 
 enum
 {
@@ -43,6 +57,59 @@ static u8 GetInverseDirection(u8 direction)
         return DIR_EAST;
     else if (direction == DIR_EAST)
         return DIR_WEST;
+}
+
+static void CB2_WildRoamingStartBattle(void)
+{
+    RunTasks();
+    AnimateSprites();
+    BuildOamBuffer();
+    UpdatePaletteFade();
+    MapMusicMain();
+}
+
+static void Task_StartWildBattle(u8 taskId)
+{   
+    struct ObjectEvent *objectEvent;
+    objectEvent = &gWildPokemonObjects[currentWildMonIndex];
+    sWildBattle->timer++;
+    switch (sWildBattle->state)
+    {   
+    case 0:
+        struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+        u8 direction = GetFaceDirectionMovementAction(GetInverseDirection(playerObjEvent->facingDirection));
+        ObjectEventSetHeldMovement(objectEvent, direction);
+        sWildBattle->timer = 0;
+        sWildBattle->state++;
+        break;
+    case 1:
+        if (sWildBattle->timer > 30)
+        {
+            sWildBattle->timer = 0;
+            sWildBattle->state++;
+        }
+        break;
+    case 2:
+        InitTrainerApproachTask(&objectEvent, 1);
+        PlaySE(SE_PIN);
+        DoTrainerApproach();
+        sWildBattle->timer = 0;
+        sWildBattle->state++;
+        break;
+    case 3:
+        if (FieldEffectActiveListContains(FLDEFF_EXCLAMATION_MARK_ICON) == FALSE)
+        {
+            sWildBattle->timer = 0;
+            sWildBattle->state++;
+        }
+        break;
+    case 4:
+        StartWildBattle(currentWildMonIndex);
+        RemoveObjectEvent(objectEvent);
+        wildPokemonObjectEventIds[currentWildMonIndex] = 0;
+        DestroyTask(taskId);
+        break;
+    }
 }
 
 // called from field_control_avatar.c every time we take a step
@@ -76,16 +143,10 @@ bool8 CheckForWildPokemonToBattle()
         u8 collisionB = GetCollisionAtCoords(objectEvent, x, y, direction);
         if(collision == COLLISION_OBJECT_EVENT || collisionB == COLLISION_OBJECT_EVENT)
         {
-            gFieldEffectArguments[0] = objectEvent->currentCoords.x;
-            gFieldEffectArguments[1] = objectEvent->currentCoords.y;
-            gFieldEffectArguments[2] = gSprites[objectEvent->spriteId].subpriority - 1;
-            gFieldEffectArguments[3] = gSprites[objectEvent->spriteId].oam.priority;
-            FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
-            direction = GetFaceDirectionMovementAction(GetInverseDirection(playerObjEvent->facingDirection));
-            ObjectEventSetHeldMovement(objectEvent, direction);
-            StartWildBattle(i);
-            //RemoveObjectEvent(objectEvent);
-            //wildPokemonObjectEventIds[i] = 0;
+            currentWildMonIndex = i;
+            sWildBattle = AllocZeroed(sizeof(*sWildBattle));
+            SetMainCallback2(CB2_WildRoamingStartBattle);
+            CreateTask(Task_StartWildBattle, 0);
             return TRUE;
         }
     }
