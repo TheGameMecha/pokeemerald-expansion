@@ -90,7 +90,7 @@ static void Task_StartWildBattle(u8 taskId)
         }
         break;
     case 2:
-        InitTrainerApproachTask(&objectEvent, 1);
+        InitTrainerApproachTask(objectEvent, 1);
         PlaySE(SE_PIN);
         DoTrainerApproach();
         sWildBattle->timer = 0;
@@ -105,7 +105,6 @@ static void Task_StartWildBattle(u8 taskId)
         break;
     case 4:
         StartWildBattle(currentWildMonIndex);
-        RemoveObjectEvent(objectEvent);
         wildPokemonObjectEventIds[currentWildMonIndex] = 0;
         DestroyTask(taskId);
         break;
