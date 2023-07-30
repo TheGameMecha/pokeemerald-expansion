@@ -2636,9 +2636,6 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
     case 3:
         InitObjectEventsLocal();
         SetCameraToTrackPlayer();
-        #if WILD_ROAMING == TRUE
-        TrySetupWildRoamingPokemon();
-        #endif
         (*state)++;
         break;
     case 4:

@@ -420,6 +420,9 @@ static void DoStandardWildBattle(bool32 isDouble)
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
     IncrementDailyWildBattles();
     TryUpdateGymLeaderRematchFromWild();
+    #if WILD_ROAMING == TRUE
+    ClearAllWildPokemonObjects();
+    #endif
 }
 
 void BattleSetup_StartRoamerBattle(void)

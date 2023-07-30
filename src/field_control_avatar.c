@@ -172,6 +172,10 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
         return TRUE;
     if (input->tookStep)
     {
+        #if WILD_ROAMING == TRUE
+        Step_CreateWildRoamingPokemon();
+        #endif
+
         IncrementGameStat(GAME_STAT_STEPS);
         IncrementBirthIslandRockStepCount();
         

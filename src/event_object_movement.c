@@ -37,6 +37,10 @@
 #include "constants/union_room.h"
 #include "constants/metatile_behaviors.h"
 
+#if WILD_ROAMING == TRUE
+#include "wild_roaming.h"
+#endif
+
 // this file was known as evobjmv.c in Game Freak's original source
 
 enum {
@@ -161,7 +165,6 @@ static void CameraObject_0(struct Sprite *);
 static void CameraObject_1(struct Sprite *);
 static void CameraObject_2(struct Sprite *);
 static const struct ObjectEventTemplate *FindObjectEventTemplateByLocalId(u8, const struct ObjectEventTemplate *, u8);
-static void ClearObjectEventMovement(struct ObjectEvent *, struct Sprite *);
 static void ObjectEventSetSingleMovement(struct ObjectEvent *, struct Sprite *, u8);
 static void SetSpriteDataForNormalStep(struct Sprite *, u8, u8);
 static void InitSpriteForFigure8Anim(struct Sprite *);
@@ -2099,6 +2102,8 @@ void ClearAllWildPokemonObjects(void)
 {
     u8 i;
 
+    numActivePokemon = 0;
+
     for (i = 0; i < MAX_ACTIVE_PKMN; i++)
         ClearObjectEvent(&gWildPokemonObjects[i]);
 }
@@ -2532,7 +2537,7 @@ u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 
     objectEventTemplate.movementRangeY = 0;
     objectEventTemplate.trainerType = TRAINER_TYPE_NONE;
     objectEventTemplate.trainerRange_berryTreeId = 0;
-    objectEventTemplate.script = script;
+    objectEventTemplate.script = NULL;
     return SpawnSpecialObjectEvent(&objectEventTemplate);
 }
 
@@ -2887,10 +2892,10 @@ static void SetBerryTreeGraphics(struct ObjectEvent *objectEvent, struct Sprite 
         if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
             berryId = 0;
 
-        LoadObjectEventPalette(gBerryTreePaletteTagTablePointers[berryId][berryStage]);
+        LoadObjectEventPalette(gBerryTreePaletteSlotTablePointers[berryId][berryStage]);
         ObjectEventSetGraphicsId(objectEvent, gBerryTreeObjectEventGraphicsIdTablePointers[berryId][berryStage]);
         sprite->images = gBerryTreePicTablePointers[berryId];
-        sprite->oam.paletteNum = IndexOfSpritePaletteTag(gBerryTreePaletteTagTablePointers[berryId][berryStage]);
+        sprite->oam.paletteNum = IndexOfSpritePaletteTag(gBerryTreePaletteSlotTablePointers[berryId][berryStage]);
         UpdatePaletteGammaType(sprite->oam.paletteNum, COLOR_MAP_CONTRAST);
         StartSpriteAnim(sprite, berryStage);
     }
@@ -5448,7 +5453,7 @@ bool8 MovementType_Invisible_Step2(struct ObjectEvent *objectEvent, struct Sprit
     return FALSE;
 }
 
-static void ClearObjectEventMovement(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+void ClearObjectEventMovement(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     objectEvent->singleMovementActive = FALSE;
     objectEvent->heldMovementActive = FALSE;
@@ -9575,6 +9580,12 @@ void FreezeObjectEvents(void)
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         if (gObjectEvents[i].active && i != gPlayerAvatar.objectEventId)
             FreezeObjectEvent(&gObjectEvents[i]);
+
+#if WILD_ROAMING == TRUE
+     for (i = 0; i < MAX_ACTIVE_PKMN; i++)
+        if (gWildPokemonObjects[i].active)
+            FreezeObjectEvent(&gWildPokemonObjects[i]);
+#endif
 }
 
 void FreezeObjectEventsExceptOne(u8 objectEventId)

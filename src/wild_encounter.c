@@ -465,15 +465,20 @@ static void CreateWildMon(u16 species, u8 level)
 }
 
 #if WILD_ROAMING == TRUE
-void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount)
+struct Pokemon CreateWildWalkingMon(void)
 {
     u16 headerId = GetCurrentMapWildMonHeaderId();
+    u8 wildMonIndex = ChooseWildMonIndex_Land();
+    u8 level = ChooseWildMonLevel(gWildMonHeaders[headerId].landMonsInfo->wildPokemon, wildMonIndex, WILD_AREA_LAND);
+    CreateWildMon(gWildMonHeaders[headerId].landMonsInfo->wildPokemon[wildMonIndex].species, level);
+    return gEnemyParty[0];
+}
+
+void CreateWildWalkingMons(struct Pokemon outputParty[], u8 amount)
+{
     for(u8 i=0; i < amount; i++)
     {
-        u8 wildMonIndex = ChooseWildMonIndex_Land();
-        u8 level = ChooseWildMonLevel(gWildMonHeaders[headerId].landMonsInfo->wildPokemon, wildMonIndex, WILD_AREA_LAND);
-        CreateWildMon(gWildMonHeaders[headerId].landMonsInfo->wildPokemon[wildMonIndex].species, level);
-        outputParty[i] = gEnemyParty[0];
+        outputParty[i] = CreateWildWalkingMon();
     }
 }
 #endif

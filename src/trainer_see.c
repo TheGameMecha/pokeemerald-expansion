@@ -495,16 +495,20 @@ static bool8 WaitTrainerExclamationMark(u8 taskId, struct Task *task, struct Obj
 // TRSEE_MOVE_TO_PLAYER
 static bool8 TrainerMoveToPlayer(u8 taskId, struct Task *task, struct ObjectEvent *trainerObj)
 {
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
     if (!ObjectEventIsMovementOverridden(trainerObj) || ObjectEventClearHeldMovementIfFinished(trainerObj))
     {
         if (task->tTrainerRange)
         {
-            ObjectEventSetHeldMovement(trainerObj, GetWalkNormalMovementAction(trainerObj->facingDirection));
+            if(playerObjEvent != trainerObj)
+                ObjectEventSetHeldMovement(trainerObj, GetWalkNormalMovementAction(trainerObj->facingDirection));
             task->tTrainerRange--;
         }
         else
         {
-            ObjectEventSetHeldMovement(trainerObj, MOVEMENT_ACTION_FACE_PLAYER);
+
+            if(playerObjEvent != trainerObj)
+                ObjectEventSetHeldMovement(trainerObj, MOVEMENT_ACTION_FACE_PLAYER);
             task->tFuncId++; // TRSEE_PLAYER_FACE
         }
     }
@@ -515,6 +519,13 @@ static bool8 TrainerMoveToPlayer(u8 taskId, struct Task *task, struct ObjectEven
 static bool8 PlayerFaceApproachingTrainer(u8 taskId, struct Task *task, struct ObjectEvent *trainerObj)
 {
     struct ObjectEvent *playerObj;
+    playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
+
+    if (playerObj == trainerObj)
+    {
+        task->tFuncId++;
+        return FALSE;
+    }
 
     if (ObjectEventIsMovementOverridden(trainerObj) && !ObjectEventClearHeldMovementIfFinished(trainerObj))
         return FALSE;
@@ -524,7 +535,6 @@ static bool8 PlayerFaceApproachingTrainer(u8 taskId, struct Task *task, struct O
     TryOverrideTemplateCoordsForObjectEvent(trainerObj, GetTrainerFacingDirectionMovementType(trainerObj->facingDirection));
     OverrideTemplateCoordsForObjectEvent(trainerObj);
 
-    playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
     if (ObjectEventIsMovementOverridden(playerObj) && !ObjectEventClearHeldMovementIfFinished(playerObj))
         return FALSE;
 
@@ -540,7 +550,8 @@ static bool8 WaitPlayerFaceApproachingTrainer(u8 taskId, struct Task *task, stru
     struct ObjectEvent *playerObj = &gObjectEvents[gPlayerAvatar.objectEventId];
 
     if (!ObjectEventIsMovementOverridden(playerObj)
-     || ObjectEventClearHeldMovementIfFinished(playerObj))
+     || ObjectEventClearHeldMovementIfFinished(playerObj)
+     || playerObj == trainerObj)
         SwitchTaskToFollowupFunc(taskId);
     return FALSE;
 }
