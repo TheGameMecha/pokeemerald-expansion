@@ -30,7 +30,7 @@ static const struct ObjectEventTemplate sWildPokemonObjectEventTemplates[NUM_SPE
     {
         .graphicsId = OBJ_EVENT_GFX_BULBASAUR,
         .elevation = 3,
-        .movementType = MOVEMENT_TYPE_LOOK_AROUND,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
         .movementRangeX = 1,
         .movementRangeY = 1,
         .trainerType = TRAINER_TYPE_NORMAL,
@@ -39,7 +39,52 @@ static const struct ObjectEventTemplate sWildPokemonObjectEventTemplates[NUM_SPE
     {
         .graphicsId = OBJ_EVENT_GFX_IVYSAUR,
         .elevation = 3,
-        .movementType = MOVEMENT_TYPE_LOOK_AROUND,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
+        .movementRangeX = 1,
+        .movementRangeY = 1,
+        .trainerType = TRAINER_TYPE_NORMAL,
+    },
+    [SPECIES_VENUSAUR] = 
+    {
+        .graphicsId = OBJ_EVENT_GFX_VENUSAUR,
+        .elevation = 3,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
+        .movementRangeX = 1,
+        .movementRangeY = 1,
+        .trainerType = TRAINER_TYPE_NORMAL,
+    },
+    [SPECIES_CHARMANDER] = 
+    {
+        .graphicsId = OBJ_EVENT_GFX_CHARMANDER,
+        .elevation = 3,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
+        .movementRangeX = 1,
+        .movementRangeY = 1,
+        .trainerType = TRAINER_TYPE_NORMAL,
+    },
+    [SPECIES_CHARMELEON] = 
+    {
+        .graphicsId = OBJ_EVENT_GFX_CHARMELEON,
+        .elevation = 3,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
+        .movementRangeX = 1,
+        .movementRangeY = 1,
+        .trainerType = TRAINER_TYPE_NORMAL,
+    },
+    [SPECIES_CHARIZARD] = 
+    {
+        .graphicsId = OBJ_EVENT_GFX_CHARIZARD,
+        .elevation = 3,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
+        .movementRangeX = 1,
+        .movementRangeY = 1,
+        .trainerType = TRAINER_TYPE_NORMAL,
+    },
+    [SPECIES_SQUIRTLE] = 
+    {
+        .graphicsId = OBJ_EVENT_GFX_SQUIRTLE,
+        .elevation = 3,
+        .movementType = MOVEMENT_TYPE_WALK_SEQUENCE_UP_LEFT_DOWN_RIGHT,
         .movementRangeX = 1,
         .movementRangeY = 1,
         .trainerType = TRAINER_TYPE_NORMAL,
