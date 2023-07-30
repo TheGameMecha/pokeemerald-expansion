@@ -2,6 +2,10 @@ ENTRY(Start)
 
 gNumMusicPlayers = 4;
 gMaxLines = 0;
+
+/* Modify the following load addresses as needed to make more room. Alternately, delete both the
+   declarations below and their references further down to get rid of the gaps.                  */
+
 gInitialMainCB2 = CB2_InitCopyrightScreenAfterBootup;
 
 SECTIONS {
@@ -342,6 +346,7 @@ SECTIONS {
         src/gym_leader_rematch.o(.text);
         src/battle_transition_frontier.o(.text);
         src/international_string_util.o(.text);
+        src/follow_me.o(.text);
         src/pokemon_debug.o(.text);
         src/expansion_intro.o(.text);
     } =0
@@ -709,6 +714,7 @@ SECTIONS {
         data/mystery_gift.o(.rodata);
         src/m4a_tables.o(.rodata);
         data/sound_data.o(.rodata);
+        src/follow_me.o(.rodata);
         src/pokemon_debug.o(.rodata);
         src/expansion_intro.o(.rodata);
     } =0
@@ -1309,7 +1315,13 @@ SECTIONS {
         data/multiboot_pokemon_colosseum.o(.rodata);
     } =0
 
-    gfx_data  :
+    anim_mon_front_pic_data :
+    ALIGN(4)
+    {
+        src/anim_mon_front_pics.o(.rodata);
+    } =0
+
+    gfx_data :
     ALIGN(4)
     {
         src/graphics.o(.rodata);

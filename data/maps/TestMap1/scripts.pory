@@ -18,7 +18,8 @@ script TestMap1_GivePokemon
 	{
 		msgbox("Here's a POKéMON!")
 		setvar(VAR_TEMP_1, POKEMON_TO_GIVE)
-		givecustommon(POKEMON_TO_GIVE, 5, ITEM_NONE, 0, NUM_NATURES, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOVE_SPLASH, MOVE_BUBBLE, MOVE_TACKLE, MOVE_NONE, 0)
+		givemon(POKEMON_TO_GIVE, 5)
+		setmonmove(0,1,MOVE_BUBBLE)
 		bufferspeciesname (STR_VAR_1, POKEMON_TO_GIVE)
 		playfanfare(MUS_OBTAIN_ITEM)
 		message("{PLAYER} received {STR_VAR_1}!")

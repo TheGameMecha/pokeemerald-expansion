@@ -7,7 +7,8 @@ TestMap1_GivePokemon::
 	goto_if_set FLAG_RECEIVED_STARTER, TestMap1_GivePokemon_2
 	msgbox TestMap1_GivePokemon_Text_1
 	setvar VAR_TEMP_1, SPECIES_MAGIKARP
-	givecustommon SPECIES_MAGIKARP, 5, ITEM_NONE, 0, NUM_NATURES, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOVE_SPLASH, MOVE_BUBBLE, MOVE_TACKLE, MOVE_NONE, 0
+	givemon SPECIES_MAGIKARP, 5
+	setmonmove 0, 1, MOVE_BUBBLE
 	bufferspeciesname STR_VAR_1, SPECIES_MAGIKARP
 	playfanfare MUS_OBTAIN_ITEM
 	message TestMap1_GivePokemon_Text_2
